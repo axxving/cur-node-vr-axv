@@ -1,6 +1,7 @@
 const { conexion } = require("./baseDatos/coneccion");
 const express = require("express");
 const cors = require("cors");
+const { Cursor } = require("mongoose");
 
 // Inicializar app
 console.log("App de node arrancada");
@@ -18,7 +19,43 @@ app.use(cors());
 // Convertir body a objeto js
 app.use(express.json());
 
-// Crear rutas
+// Crear rutas ejemplo
+app.get("/probando", (req, res) => {
+  console.log("Se ha ejecutado la ruta de prueba");
+
+  // return res.status(200).send(`
+  //     <div>Probando ruta de node js</div>
+  //     <p>Creando API Rest con node js</p>
+  //   `);
+
+  // return res.status(200).send({
+
+  // return res.status(200).json({
+  //   curso: "Master en React",
+  //   autor: "Victor Robles Web",
+  //   url: "victorrobles.es/master-react",
+  // });
+
+  return res.status(200).json([
+    {
+      curso: "Master en React",
+      autor: "Victor Robles Web",
+      url: "victorrobles.es/master-react",
+    },
+    {
+      curso: "Master en React",
+      autor: "Victor Robles Web",
+      url: "victorrobles.es/master-react",
+    }
+  ]);
+});
+
+// Inicio de la aplicacion
+app.get("/", (req, res) => {
+  return res.status(200).send(
+    `<h2>Empezando a crear una API rest con node js</h2>`
+  )
+})
 
 // Crear el servidor y escuchar peticiones\
 app.listen(puerto, () => {
