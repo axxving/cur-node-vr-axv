@@ -19,6 +19,12 @@ app.use(cors());
 // Convertir body a objeto js
 app.use(express.json());
 
+// RUTAS
+const rutas_articulo = require("./rutas/articulo");
+
+// cargo las rutas
+app.use("/api", rutas_articulo);
+
 // Crear rutas ejemplo
 app.get("/probando", (req, res) => {
   console.log("Se ha ejecutado la ruta de prueba");
@@ -46,16 +52,16 @@ app.get("/probando", (req, res) => {
       curso: "Master en React",
       autor: "Victor Robles Web",
       url: "victorrobles.es/master-react",
-    }
+    },
   ]);
 });
 
 // Inicio de la aplicacion
 app.get("/", (req, res) => {
-  return res.status(200).send(
-    `<h2>Empezando a crear una API rest con node js</h2>`
-  )
-})
+  return res
+    .status(200)
+    .send(`<h2>Empezando a crear una API rest con node js</h2>`);
+});
 
 // Crear el servidor y escuchar peticiones\
 app.listen(puerto, () => {

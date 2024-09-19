@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 
+// Modelo de articulos
 const ArticuloSchema = Schema({
   titulo: {
     type: String,
@@ -19,4 +20,5 @@ const ArticuloSchema = Schema({
   },
 });
 
+// Exportando el modelo 
 module.exports = model("Articulo", ArticuloSchema, "articulos");
