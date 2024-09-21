@@ -19,6 +19,9 @@ app.use(cors());
 // Convertir body a objeto js
 app.use(express.json());
 
+// Convertir body a urlencoded
+app.use(express.urlencoded({ extended: true })); // form - urlencode
+
 // RUTAS
 const rutas_articulo = require("./rutas/articulo");
 
