@@ -71,9 +71,26 @@ const crear = async (req, res) => {
   }
 };
 
+const listar = async (req, res) => {
+  try {
+    const articulos = await Articulo.find({});
+
+    return res.status(200).send({
+      status: "success",
+      articulos,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      mensaje: "No se han encontrado artículos",
+    });
+  }
+};
+
 // Exportando el controlador para que pueda ser usado
 module.exports = {
   prueba,
   curso,
   crear,
+  listar,
 };
