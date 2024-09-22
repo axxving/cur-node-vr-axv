@@ -94,6 +94,35 @@ const listar = async (req, res) => {
   }
 };
 
+const unArticulo = async (req, res) => {
+  try {
+    // Recoger el id de la URL
+    const id = req.params.id;
+
+    // Buscar un artículo por su id
+    const articulo = await Articulo.findById(id);
+
+    // Si no se encuentra el artículo, lanzar un error
+    if (!articulo) {
+      return res.status(404).json({
+        status: "error",
+        mensaje: "No se ha encontrado el artículo",
+      });
+    }
+
+    // Si se encuentra el artículo, devolver el resultado
+    return res.status(200).json({
+      status: "success",
+      articulo,
+    });
+  } catch (error) {
+    // Manejar errores y devolver una respuesta de error
+    return res.status(500).json({
+      status: "error",
+      mensaje: "Error en la consulta del artículo",
+    });
+  }
+};
 
 // Exportando el controlador para que pueda ser usado
 module.exports = {
@@ -101,4 +130,5 @@ module.exports = {
   curso,
   crear,
   listar,
+  unArticulo,
 };
