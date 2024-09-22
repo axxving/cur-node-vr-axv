@@ -73,10 +73,17 @@ const crear = async (req, res) => {
 
 const listar = async (req, res) => {
   try {
-    const articulos = await Articulo.find({});
+    let articulos;
+
+    if (req.params.ultimos) {
+      articulos = await Articulo.find({}).sort({ fecha: -1 }).limit(3);
+    } else {
+      articulos = await Articulo.find({}).sort({ fecha: -1 });
+    }
 
     return res.status(200).send({
       status: "success",
+      contador: articulos.length,
       articulos,
     });
   } catch (error) {
@@ -86,6 +93,7 @@ const listar = async (req, res) => {
     });
   }
 };
+
 
 // Exportando el controlador para que pueda ser usado
 module.exports = {

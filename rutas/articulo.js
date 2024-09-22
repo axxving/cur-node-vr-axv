@@ -15,6 +15,6 @@ router.get("/curso", ArticuloControlador.curso);
 router.post("/crear", ArticuloControlador.crear);
 
 // Obtener articulos
-router.get("/articulos", ArticuloControlador.listar);
+router.get("/articulos/:ultimos?", ArticuloControlador.listar);
 
 module.exports = router;
