@@ -23,4 +23,7 @@ router.get("/articuloId/:id", ArticuloControlador.unArticulo);
 // Borrar un articulo por su id
 router.delete("/articuloDeleteId/:id", ArticuloControlador.borrarArticulo);
 
+// Editar un articulo
+router.put("/editarArticulo/:id", ArticuloControlador.editar);
+
 module.exports = router;

@@ -97,7 +97,7 @@ const listar = async (req, res) => {
 const unArticulo = async (req, res) => {
   try {
     // Recoger el id de la URL
-    const id = req.params.id;
+    let id = req.params.id;
 
     // Buscar un artículo por su id
     const articulo = await Articulo.findById(id);
@@ -127,7 +127,7 @@ const unArticulo = async (req, res) => {
 const borrarArticulo = async (req, res) => {
   try {
     // Recoger el id del artículo a borrar
-    const id = req.params.id;
+    let id = req.params.id;
 
     // Buscar y borrar el artículo
     const articuloBorrado = await Articulo.findOneAndDelete({ _id: id });
@@ -145,12 +145,62 @@ const borrarArticulo = async (req, res) => {
       status: "success",
       articulo: articuloBorrado,
     });
-
   } catch (error) {
     // Manejar errores y devolver una respuesta de error
     return res.status(500).json({
       status: "error",
       mensaje: "Error en el proceso de borrado del artículo",
+    });
+  }
+};
+
+const editar = async (req, res) => {
+  try {
+    // Obtener el id del articulo
+    const id = req.params.id;
+
+    // Recoger los datos del body
+    const articuloAEditar = req.body;
+
+    // Validar datos
+    const validarTitulo =
+      !validator.isEmpty(articuloAEditar.titulo) &&
+      validator.isLength(articuloAEditar.titulo, { min: 5 });
+    const validarContenido = !validator.isEmpty(articuloAEditar.contenido);
+
+    if (!validarTitulo || !validarContenido) {
+      return res.status(400).json({
+        status: "error",
+        mensaje: "Validación fallida. Datos incorrectos.",
+      });
+    }
+
+    // Buscar y actualizar articulo
+    const articuloActualizado = await Articulo.findOneAndUpdate(
+      { _id: id },
+      articuloAEditar,
+      // Para devolver el artículo actualizado
+      { new: true }
+    );
+
+    // Si no se encuentra el artículo, devolver error
+    if (!articuloActualizado) {
+      return res.status(404).json({
+        status: "error",
+        mensaje: "No se ha encontrado el artículo",
+      });
+    }
+
+    // Devolver una respuesta con el artículo actualizado
+    return res.status(200).json({
+      status: "success",
+      articulo: articuloActualizado,
+    });
+  } catch (error) {
+    // Manejar errores y devolver una respuesta de error
+    return res.status(500).json({
+      status: "error",
+      mensaje: "Error en el proceso de edición del artículo",
     });
   }
 };
@@ -163,4 +213,5 @@ module.exports = {
   listar,
   unArticulo,
   borrarArticulo,
+  editar,
 };
