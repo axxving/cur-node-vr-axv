@@ -1,4 +1,4 @@
-const validator = require("validator");
+const { validarArticulo } = require("../helpers/validar");
 const Articulo = require("../modelos/Articulo");
 
 // Generando un controlador
@@ -35,14 +35,7 @@ const crear = async (req, res) => {
 
   // Validar datos
   try {
-    let validarTitulo =
-      !validator.isEmpty(parametros.titulo) &&
-      validator.isLength(parametros.titulo, { min: 5, max: undefined });
-    let validarContenido = !validator.isEmpty(parametros.contenido);
-
-    if (!validarTitulo || !validarContenido) {
-      throw new Error("No se ha validado la información");
-    }
+    validarArticulo(parametros);
   } catch (error) {
     return res.status(400).json({
       status: "error",
@@ -163,17 +156,7 @@ const editar = async (req, res) => {
     const articuloAEditar = req.body;
 
     // Validar datos
-    const validarTitulo =
-      !validator.isEmpty(articuloAEditar.titulo) &&
-      validator.isLength(articuloAEditar.titulo, { min: 5 });
-    const validarContenido = !validator.isEmpty(articuloAEditar.contenido);
-
-    if (!validarTitulo || !validarContenido) {
-      return res.status(400).json({
-        status: "error",
-        mensaje: "Validación fallida. Datos incorrectos.",
-      });
-    }
+    validarArticulo(articuloAEditar);
 
     // Buscar y actualizar articulo
     const articuloActualizado = await Articulo.findOneAndUpdate(
