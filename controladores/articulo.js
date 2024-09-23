@@ -124,6 +124,37 @@ const unArticulo = async (req, res) => {
   }
 };
 
+const borrarArticulo = async (req, res) => {
+  try {
+    // Recoger el id del artículo a borrar
+    const id = req.params.id;
+
+    // Buscar y borrar el artículo
+    const articuloBorrado = await Articulo.findOneAndDelete({ _id: id });
+
+    // Si no se encuentra el artículo, lanzar un error
+    if (!articuloBorrado) {
+      return res.status(404).json({
+        status: "error",
+        mensaje: "No se ha encontrado el artículo",
+      });
+    }
+
+    // Si se encuentra y se borra el artículo, devolver el resultado
+    return res.status(200).json({
+      status: "success",
+      articulo: articuloBorrado,
+    });
+
+  } catch (error) {
+    // Manejar errores y devolver una respuesta de error
+    return res.status(500).json({
+      status: "error",
+      mensaje: "Error en el proceso de borrado del artículo",
+    });
+  }
+};
+
 // Exportando el controlador para que pueda ser usado
 module.exports = {
   prueba,
@@ -131,4 +162,5 @@ module.exports = {
   crear,
   listar,
   unArticulo,
+  borrarArticulo,
 };

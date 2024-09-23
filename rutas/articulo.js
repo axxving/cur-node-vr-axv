@@ -17,7 +17,10 @@ router.post("/crear", ArticuloControlador.crear);
 // Obtener articulos
 router.get("/articulos/:ultimos?", ArticuloControlador.listar);
 
-// Obtener un articulo
+// Obtener un articulo por su id
 router.get("/articuloId/:id", ArticuloControlador.unArticulo);
+
+// Borrar un articulo por su id
+router.delete("/articuloDeleteId/:id", ArticuloControlador.borrarArticulo);
 
 module.exports = router;
