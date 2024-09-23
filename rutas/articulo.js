@@ -1,6 +1,18 @@
 // const { Router } = require("express");\
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+
+const almacenamiento = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './imagenes/articulos/')
+    },
+    filename: (req, file, cb) => {
+        cb(null, "articulo" + Date.now() + file.originalname)
+    }
+})
+
+const subidas = multer({storage: almacenamiento})
 
 // Cargando controlador de articulo
 const ArticuloControlador = require("../controladores/articulo.js");
@@ -25,5 +37,8 @@ router.delete("/articuloDeleteId/:id", ArticuloControlador.borrarArticulo);
 
 // Editar un articulo
 router.put("/editarArticulo/:id", ArticuloControlador.editar);
+
+// subir un archivo de imagen
+router.post("/subir-imagen/:id", [subidas.single("file0")], ArticuloControlador.subir);
 
 module.exports = router;

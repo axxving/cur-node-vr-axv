@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { validarArticulo } = require("../helpers/validar");
 const Articulo = require("../modelos/Articulo");
 
@@ -188,6 +189,56 @@ const editar = async (req, res) => {
   }
 };
 
+const subir = async (req, res) => {
+  try {
+    // Recoger la imagen
+
+    if (!req.file && !req.files) {
+      return res.status(404).json({
+        status: "error",
+        mensaje: "Petición invalida.",
+      });
+    }
+
+    // Nombre del archivo
+    let archivo = req.file.originalname;
+
+    // Extensión del archivo subido
+    let extension = archivo.split(".").pop().toLowerCase();
+
+    // Comprobar la extensión correcta
+    if (extension !== "jpg" && extension !== "png" && extension !== "gif") {
+      // Borrar archivo y dar respuesta
+      fs.unlink(req.file.path, (error) => {
+        if (error) {
+          return res.status(500).json({
+            status: "error",
+            mensaje: "Error al eliminar el archivo incorrecto",
+          });
+        }
+        return res.status(400).json({
+          status: "error",
+          mensaje: "La imagen no tiene la extensión correcta",
+        });
+      });
+      return; // Termina la ejecución si la extensión es incorrecta
+    }
+
+    // Si todo va bien, devolver una respuesta
+    return res.status(200).json({
+      status: "success",
+      mensaje: "Todo funciona correctamente",
+      file: req.file,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      mensaje: "Error en el proceso de subida de la imagen",
+    });
+  }
+};
+
+
 // Exportando el controlador para que pueda ser usado
 module.exports = {
   prueba,
@@ -197,4 +248,5 @@ module.exports = {
   unArticulo,
   borrarArticulo,
   editar,
+  subir,
 };
