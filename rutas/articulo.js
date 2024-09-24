@@ -4,15 +4,15 @@ const router = express.Router();
 const multer = require("multer");
 
 const almacenamiento = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './imagenes/articulos/')
-    },
-    filename: (req, file, cb) => {
-        cb(null, "articulo" + Date.now() + file.originalname)
-    }
-})
+  destination: (req, file, cb) => {
+    cb(null, "./imagenes/articulos/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, "articulo" + Date.now() + file.originalname);
+  },
+});
 
-const subidas = multer({storage: almacenamiento})
+const subidas = multer({ storage: almacenamiento });
 
 // Cargando controlador de articulo
 const ArticuloControlador = require("../controladores/articulo.js");
@@ -39,6 +39,13 @@ router.delete("/articuloDeleteId/:id", ArticuloControlador.borrarArticulo);
 router.put("/editarArticulo/:id", ArticuloControlador.editar);
 
 // subir un archivo de imagen
-router.post("/subir-imagen/:id", [subidas.single("file0")], ArticuloControlador.subir);
+router.post(
+  "/subir-imagen/:id",
+  [subidas.single("file0")],
+  ArticuloControlador.subir
+);
+
+// Consultar una imagen
+router.get("/imagen/:fichero", ArticuloControlador.imagen);
 
 module.exports = router;

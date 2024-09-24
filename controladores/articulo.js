@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const { validarArticulo } = require("../helpers/validar");
 const Articulo = require("../modelos/Articulo");
 
@@ -191,12 +192,11 @@ const editar = async (req, res) => {
 
 const subir = async (req, res) => {
   try {
-    // Recoger la imagen
-
-    if (!req.file && !req.files) {
+    // Comprobar si el archivo fue subido
+    if (!req.file) {
       return res.status(404).json({
         status: "error",
-        mensaje: "Petición invalida.",
+        mensaje: "No se ha subido ningún archivo.",
       });
     }
 
@@ -207,8 +207,13 @@ const subir = async (req, res) => {
     let extension = archivo.split(".").pop().toLowerCase();
 
     // Comprobar la extensión correcta
-    if (extension !== "jpg" && extension !== "png" && extension !== "gif") {
-      // Borrar archivo y dar respuesta
+    if (
+      extension !== "jpg" &&
+      extension !== "png" &&
+      extension !== "gif" &&
+      extension !== "jpeg"
+    ) {
+      // Borrar archivo si no tiene una extensión válida
       fs.unlink(req.file.path, (error) => {
         if (error) {
           return res.status(500).json({
@@ -221,13 +226,32 @@ const subir = async (req, res) => {
           mensaje: "La imagen no tiene la extensión correcta",
         });
       });
-      return; // Termina la ejecución si la extensión es incorrecta
+      return;
     }
 
-    // Si todo va bien, devolver una respuesta
+    // Recoger el id del artículo
+    const id = req.params.id;
+
+    // Buscar y actualizar el artículo con la nueva imagen
+    const articuloActualizado = await Articulo.findOneAndUpdate(
+      { _id: id },
+      { imagen: req.file.filename }, // Asegúrate de guardar el nombre de la imagen
+      { new: true } // Para devolver el artículo actualizado
+    );
+
+    // Si no se encuentra el artículo, devolver error
+    if (!articuloActualizado) {
+      return res.status(404).json({
+        status: "error",
+        mensaje: "No se ha encontrado el artículo",
+      });
+    }
+
+    // Devolver una respuesta con el artículo actualizado y la imagen
     return res.status(200).json({
       status: "success",
-      mensaje: "Todo funciona correctamente",
+      mensaje: "Imagen subida y artículo actualizado con éxito",
+      articulo: articuloActualizado,
       file: req.file,
     });
   } catch (error) {
@@ -238,6 +262,24 @@ const subir = async (req, res) => {
   }
 };
 
+const imagen = (req, res) => {
+  let fichero = req.params.fichero;
+  let ruta_fisica = path.resolve("./imagenes/articulos/" + fichero);
+
+  // Verificar si el archivo existe usando fs.access
+  fs.access(ruta_fisica, fs.constants.F_OK, (err) => {
+    if (!err) {
+      // Si no hay error, el archivo existe, así que lo enviamos
+      return res.sendFile(ruta_fisica);
+    } else {
+      // Si hay un error, significa que el archivo no existe o no es accesible
+      return res.status(404).json({
+        status: "error",
+        mensaje: "La imagen no existe",
+      });
+    }
+  });
+};
 
 // Exportando el controlador para que pueda ser usado
 module.exports = {
@@ -249,4 +291,5 @@ module.exports = {
   borrarArticulo,
   editar,
   subir,
+  imagen,
 };
