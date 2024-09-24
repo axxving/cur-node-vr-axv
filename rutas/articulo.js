@@ -48,4 +48,7 @@ router.post(
 // Consultar una imagen
 router.get("/imagen/:fichero", ArticuloControlador.imagen);
 
+// Ruta de buscador
+router.get("/buscar/:busqueda", ArticuloControlador.buscador);
+
 module.exports = router;

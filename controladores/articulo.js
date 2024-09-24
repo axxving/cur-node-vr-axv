@@ -281,6 +281,41 @@ const imagen = (req, res) => {
   });
 };
 
+const buscador = async (req, res) => {
+  try {
+    // Sacar el string de búsqueda
+    let busqueda = req.params.busqueda;
+
+    // Realizar la búsqueda en los campos 'titulo' y 'contenido' utilizando promesas con async/await
+    const articulosEncontrados = await Articulo.find({
+      $or: [
+        { titulo: { $regex: busqueda, $options: "i" } }, // Buscar en el campo 'titulo'
+        { contenido: { $regex: busqueda, $options: "i" } }, // Buscar en el campo 'contenido'
+      ],
+    }).sort({ fecha: -1 });
+
+    // Si no se encuentran artículos, devolver un mensaje de error
+    if (error || !articulosEncontrados || articulosEncontrados.length <= 0) {
+      return res.status(404).json({
+        status: "error",
+        mensaje: "No hay resultados para la búsqueda",
+      });
+    }
+
+    // Si hay resultados, devolver los artículos encontrados
+    return res.status(200).json({
+      status: "ok",
+      articulos: articulosEncontrados,
+    });
+  } catch (error) {
+    // Manejo de errores
+    return res.status(500).json({
+      status: "error",
+      mensaje: "Error en la búsqueda",
+    });
+  }
+};
+
 // Exportando el controlador para que pueda ser usado
 module.exports = {
   prueba,
@@ -292,4 +327,5 @@ module.exports = {
   editar,
   subir,
   imagen,
+  buscador,
 };
