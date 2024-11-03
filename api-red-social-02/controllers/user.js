@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/model-user');
+const jwt = require('../services/jwt');
 
 // Acciones de prueba
 const pruebaUser = (req, res) => {
@@ -72,56 +73,59 @@ const register = async (req, res) => {
     }
 };
 
-const loginUser = (req, res) => {
-    // Recoger los parámetros
-    const params = req.body;
+const loginUser = async (req, res) => {
+    try {
+        // Recoger los parámetros
+        const params = req.body;
 
-    if (!params.email || !params.password) {
-        return res.status(400).send({
+        if (!params.email || !params.password) {
+            return res.status(400).send({
+                status: 'error',
+                mensaje: 'Falta email o contraseña',
+            });
+        }
+
+        // Buscar en la base de datos si existe
+        const user = await User.findOne({ email: params.email }); // Ahora se usa await
+
+        if (!user) {
+            return res.status(404).send({
+                status: 'error',
+                mensaje: 'El usuario no existe',
+            });
+        }
+
+        // Comprobar su contraseña
+        const isPasswordValid = await bcrypt.compare(params.password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(400).send({
+                status: 'error',
+                mensaje: 'La contraseña no es correcta',
+            });
+        }
+
+        // Generar Token
+        const token = jwt.generateToken(user);
+
+        // Devolver datos del usuario
+        return res.status(200).send({
+            status: 'success',
+            mensaje: 'Login exitoso',
+            user: {
+                id: user._id,
+                name: user.name,
+                nick: user.nick,
+            },
+            token,
+        });
+    } catch (error) {
+        console.error('Error en el servidor:', error);
+        return res.status(500).send({
             status: 'error',
-            mensaje: 'Falta email o contraseña',
+            mensaje: 'Error en el servidor',
         });
     }
-
-    // Buscar en la base de datos si existe
-    User.findOne({ email: params.email })
-        // .select({ password: 0 })
-        .exec((error, user) => {
-            if (error || !user) {
-                return res.status(404).send({
-                    status: 'error',
-                    mensaje: 'Una de las credenciales no existe',
-                });
-            }
-
-            // Comprobar su contraseña
-            const pwd = bcrypt.compareSync(params.password, user.password);
-
-            if (!pwd) {
-                return res.status(400).send({
-                    status: 'error',
-                    mensaje: 'La contraseña no es correcta',
-                });
-            }
-
-            // Conseguir Token
-            const token = false;
-
-            // Eliminar password del objeto
-
-            // Devolver datos del usuario
-
-            return res.status(200).send({
-                status: 'success',
-                mensaje: 'Login exitoso',
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    nick: user.nick,
-                },
-                token,
-            });
-        });
 };
 
 // exportar acciones
