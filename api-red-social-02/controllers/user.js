@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const User = require('../models/model-user');
 
 // Acciones de prueba
@@ -9,19 +10,66 @@ const pruebaUser = (req, res) => {
 
 // Registro de usuario
 const register = async (req, res) => {
-    // Recoger datos de la peticion
+    // Recoger datos de la petición
+    const params = req.body;
+    console.log(params);
 
-    // Comprobar que me llegan bien (+ validacion)
+    // Comprobar que llegan los datos necesarios (+ validación)
+    if (!params.name || !params.email || !params.password || !params.nick) {
+        console.log('Validación mínima no pasada');
 
-    // Control usuarios duplicados
+        return res.status(400).send({
+            status: 'error',
+            mensaje: 'Faltan datos por enviar.',
+            params: params,
+        });
+    }
 
-    // Cifrar la contraseña
+    try {
+        // Convertir email y nick a minúsculas antes de hacer la consulta para asegurar consistencia
+        const email = params.email.toLowerCase();
+        const nick = params.nick.toLowerCase();
 
-    // Guardar en la base de datos
+        // Control de usuarios duplicados
+        const users = await User.find({
+            $or: [{ email: email }, { nick: nick }],
+        });
 
-    return res.status(200).json({
-        mensaje: 'Accion de registro de usuarios.',
-    });
+        if (users.length > 0) {
+            return res.status(409).send({
+                // Cambié el código a 409 para conflicto
+                status: 'error',
+                mensaje: 'El usuario ya existe',
+            });
+        }
+
+        // Cifrar la contraseña
+        const pwd = await bcrypt.hash(params.password, 10);
+        params.password = pwd;
+
+        // Crear el objeto de usuario
+        const user_to_save = new User({
+            ...params,
+            email: email,
+            nick: nick,
+        });
+
+        // Guardar en la base de datos
+        const userStored = await user_to_save.save();
+
+        // Devolver resultado
+        return res.status(201).send({
+            status: 'success',
+            mensaje: 'Usuario registrado correctamente',
+            user: userStored,
+        });
+    } catch (error) {
+        return res.status(500).send({
+            status: 'error',
+            mensaje: 'Error en la petición o al guardar en la base de datos',
+            error: error.message,
+        });
+    }
 };
 
 // exportar acciones

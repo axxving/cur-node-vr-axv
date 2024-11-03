@@ -15,6 +15,11 @@ const UserSchema = Schema({
         required: true,
         unique: true,
     },
+    password: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     role: {
         type: String,
         default: 'role_user',
