@@ -26,13 +26,13 @@ const PublicationRoutes = require('./routes/route-publication');
 const FollowRoutes = require('./routes/route-follow');
 
 // Rutas de usuario
-app.use('/api', UserRoutes);
+app.use('/api/user', UserRoutes);
 
 // Rutas publicaciones
-app.use('/api', PublicationRoutes);
+app.use('/api/publication', PublicationRoutes);
 
 // Rutas de follow
-app.use('/api', FollowRoutes);
+app.use('/api/follow', FollowRoutes);
 
 // Ruta de prueba
 app.get('/ruta-prueba', (req, res) => {
