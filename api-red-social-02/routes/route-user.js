@@ -8,5 +8,8 @@ router.get('/prueba-usuario', UserController.pruebaUser);
 // Registro de usuario
 router.post('/register', UserController.register);
 
+// Login de usuario
+router.post('/login', UserController.loginUser);
+
 // Exportar router
 module.exports = router;

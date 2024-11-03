@@ -72,8 +72,61 @@ const register = async (req, res) => {
     }
 };
 
+const loginUser = (req, res) => {
+    // Recoger los parámetros
+    const params = req.body;
+
+    if (!params.email || !params.password) {
+        return res.status(400).send({
+            status: 'error',
+            mensaje: 'Falta email o contraseña',
+        });
+    }
+
+    // Buscar en la base de datos si existe
+    User.findOne({ email: params.email })
+        // .select({ password: 0 })
+        .exec((error, user) => {
+            if (error || !user) {
+                return res.status(404).send({
+                    status: 'error',
+                    mensaje: 'Una de las credenciales no existe',
+                });
+            }
+
+            // Comprobar su contraseña
+            const pwd = bcrypt.compareSync(params.password, user.password);
+
+            if (!pwd) {
+                return res.status(400).send({
+                    status: 'error',
+                    mensaje: 'La contraseña no es correcta',
+                });
+            }
+
+            // Conseguir Token
+            const token = false;
+
+            // Eliminar password del objeto
+
+            // Devolver datos del usuario
+
+            return res.status(200).send({
+                status: 'success',
+                mensaje: 'Login exitoso',
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    nick: user.nick,
+                },
+                token,
+            });
+        });
+};
+
 // exportar acciones
 module.exports = {
     pruebaUser,
     register,
+    loginUser,
 };
