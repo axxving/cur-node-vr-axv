@@ -6,6 +6,7 @@ const jwt = require('../services/jwt');
 const pruebaUser = (req, res) => {
     return res.status(200).send({
         mensaje: 'Mensaje enviado desde: controllers/user.js',
+        usuario: req.user,
     });
 };
 
@@ -86,7 +87,7 @@ const loginUser = async (req, res) => {
         }
 
         // Buscar en la base de datos si existe
-        const user = await User.findOne({ email: params.email }); // Ahora se usa await
+        const user = await User.findOne({ email: params.email });
 
         if (!user) {
             return res.status(404).send({
@@ -128,7 +129,7 @@ const loginUser = async (req, res) => {
     }
 };
 
-// exportar acciones
+// Exportar acciones
 module.exports = {
     pruebaUser,
     register,
